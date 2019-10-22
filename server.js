@@ -8,6 +8,7 @@ const passport = require('passport');
 const session = require('express-session');
 const ObjectID = require('mongodb').ObjectID;
 const mongo = require('mongodb').MongoClient;
+const LocalStrategy = require('passport-local');
 
 const app = express();
 
@@ -46,6 +47,16 @@ mongo.connect(process.env.DATABASE, (err, db) => {
         done(null, data);
       });
     });
+    
+    passport.use(new LocalStrategy((username, password, done) =>{
+      db.collection('users').findOne({ username: username }, (err, user) => {
+        console.log(`User ${username} attempted to login`);
+        if (err) return done(err);
+        if (!user) return done(null, false);
+        if (password !== user.password) return done(null, false);
+        return done(null, user);
+      });
+    }));
 
     app.listen(process.env.PORT || 3000, () => {
       console.log("Listening on port " + process.env.PORT);
