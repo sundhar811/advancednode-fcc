@@ -36,6 +36,12 @@ app.route('/')
     res.render(process.cwd() + '/views/pug/index.pug', { title: 'Home Page', message: 'Please login', showLogin: true });
   });
 
+app.route('/logout')
+  .get((req, res) => {
+    req.logout();
+    res.redirect('/');
+  });
+
 mongo.connect(process.env.DATABASE, (err, db) => {
   if(err) {
     console.log('Database error: ' + err);
@@ -69,10 +75,16 @@ mongo.connect(process.env.DATABASE, (err, db) => {
     app.route('/profile')
       .get(ensureAuthenticated, (req, res) => {
         res.render(process.cwd() + '/views/pug/profile.pug', { username: req.user.username });
-    });
+      });
     
     app.listen(process.env.PORT || 3000, () => {
       console.log("Listening on port " + process.env.PORT);
     });
   }
+});
+
+app.use((req, res, next) => {
+  res.status(404)
+    .type('text')
+    .send('Not Found')
 });
