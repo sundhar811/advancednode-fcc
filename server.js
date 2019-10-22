@@ -33,7 +33,12 @@ app.set('view engine', 'pug');
 
 app.route('/')
   .get((req, res) => {
-    res.render(process.cwd() + '/views/pug/index.pug', { title: 'Home Page', message: 'Please login', showLogin: true });
+    res.render(process.cwd() + '/views/pug/index.pug', {
+      title: 'Home Page',
+      message: 'Please login',
+      showLogin: true,
+      showRegistration: true
+    });
   });
 
 app.route('/logout')
@@ -77,14 +82,31 @@ mongo.connect(process.env.DATABASE, (err, db) => {
         res.render(process.cwd() + '/views/pug/profile.pug', { username: req.user.username });
       });
     
+    app.route('/register')
+      .post((req, res, next) => {
+        db.collection('users').findOne({ username: req.body.username }, (err, user) => {
+          if(err) next(err);
+          else if (user) res.redirect('/')
+          else {
+            db.collection('users').insertOne({
+              username: req.body.username,
+              password: req.body.password
+            }, (err, doc) => {
+              if (err) res.redirect('/');
+              else next(null, user);
+            });
+          }
+        });
+      }, passport.authenticate('local', { failureRedirect: '/' }),(req, res, next) => res.redirect('/profile'));
+    
+    app.use((req, res, next) => {
+      res.status(404)
+        .type('text')
+        .send('Not Found')
+    });
+    
     app.listen(process.env.PORT || 3000, () => {
       console.log("Listening on port " + process.env.PORT);
     });
   }
-});
-
-app.use((req, res, next) => {
-  res.status(404)
-    .type('text')
-    .send('Not Found')
 });

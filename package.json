@@ -14,7 +14,7 @@
     "express": "^4.16.4",
     "cors": "^2.8.5",
     "body-parser": "^1.19.0",
-    "mongodb": "^3.3.2",
+    "mongodb": "^2.2.33",
     "helmet": "^3.21.2",
     "pug": "^2.0.4",
     "passport": "^0.4.0",
