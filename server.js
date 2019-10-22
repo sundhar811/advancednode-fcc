@@ -68,7 +68,7 @@ mongo.connect(process.env.DATABASE, (err, db) => {
     
     app.route('/profile')
       .get(ensureAuthenticated, (req, res) => {
-        res.render(process.cwd() + '/views/pug/profile.pug');
+        res.render(process.cwd() + '/views/pug/profile.pug', { username: req.user.username });
     });
     
     app.listen(process.env.PORT || 3000, () => {
